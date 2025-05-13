@@ -1,0 +1,99 @@
+from fastapi.staticfiles import StaticFiles
+
+app = FastAPI(title="Question Generator API")
+
+# Mount static files BEFORE including routers
+app.mount("/static", StaticFiles(directory="api/static"), name="static")
+
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.container {
+    background-color: #f5f5f5;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.error {
+    color: #dc3545;
+    padding: 10px;
+    margin-top: 15px;
+    border: 1px solid #f5c2c7;
+    border-radius: 4px;
+    background-color: #f8d7da;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="file"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Add these at the bottom */
+.result-container {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-top: 2px solid #eee;
+}
+
+.preview-area {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.preview-area pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+}
+
+.download-button {
+    margin-top: 1rem;
+    background: #4CAF50;
+    color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+.error {
+    color: #dc3545;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+}

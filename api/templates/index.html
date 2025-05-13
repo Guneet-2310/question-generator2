@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Question Generator</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>PDF Question Generator</h1>
+      <form id="generateForm" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="pdfFile">Upload PDF:</label>
+          <input type="file" id="pdfFile" name="file" accept=".pdf" required />
+        </div>
+
+        <div class="form-group">
+          <label for="numMCQ">MCQ Questions:</label>
+          <input
+            type="number"
+            id="numMCQ"
+            name="num_mcqs"
+            min="1"
+            max="10"
+            value="3"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="numShort">Short Answer:</label>
+          <input
+            type="number"
+            id="numShort"
+            name="num_shortans"
+            min="1"
+            max="5"
+            value="2"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="difficulty">Difficulty:</label>
+          <select id="difficulty" name="difficulty" required>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+
+        <button type="submit">Generate Questions</button>
+      </form>
+
+      <div id="result" class="result-container">
+      <div id="questionsPreview" class="preview-area"></div>
+      <button id="downloadBtn" class="download-button hidden">Download PDF</button>
+    </div>
+
+
+<script>
+  document.getElementById('generateForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const pdfFile = document.getElementById('pdfFile').files[0];
+    if (!pdfFile) {
+      alert('Please select a PDF file');
+      return;
+    }
+
+    const params = new URLSearchParams({
+      num_mcqs: document.getElementById('numMCQ').value,
+      num_shortans: document.getElementById('numShort').value,
+      difficulty: document.getElementById('difficulty').value
+    });
+
+    try {
+      // Clear previous results
+      document.getElementById('questionsPreview').innerHTML = '';
+      document.getElementById('downloadBtn').classList.add('hidden');
+
+      // First get text version
+      const textForm = new FormData();
+      textForm.append('file', pdfFile);
+
+      const textResponse = await fetch(`/generate/questions/text?${params}`, {
+        method: 'POST',
+        body: textForm
+      });
+
+      if (!textResponse.ok) {
+        const error = await textResponse.json();
+        throw new Error(error.detail);
+      }
+
+      const data = await textResponse.json();
+
+      // Display questions
+      document.getElementById('questionsPreview').innerHTML =
+        `<h3>Generated Questions:</h3>
+         <pre>${data.questions}</pre>`;
+
+      // Show download button
+      const downloadBtn = document.getElementById('downloadBtn');
+      downloadBtn.classList.remove('hidden');
+
+      downloadBtn.onclick = async () => {
+        try {
+          // Rebuild FormData for PDF request
+          const pdfForm = new FormData();
+          pdfForm.append('file', pdfFile);
+
+          const pdfResponse = await fetch(`/generate/questions?${params}`, {
+            method: 'POST',
+            body: pdfForm
+          });
+
+          if (!pdfResponse.ok) {
+            const error = await pdfResponse.json();
+            alert(`PDF Error: ${error.detail}`);
+            return;
+          }
+
+          const blob = await pdfResponse.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'questions.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        } catch (err) {
+          alert(`Download failed: ${err.message}`);
+        }
+      };
+
+    } catch (error) {
+      document.getElementById('result').innerHTML = `
+        <div class="error">${error.message}</div>
+      `;
+    }
+  });
+</script>
+
+  </body>
+</html>
