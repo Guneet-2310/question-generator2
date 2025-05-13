@@ -1,15 +1,16 @@
 {
   "version": 2,
   "builds": [
-    { "src": "app/**/*.py", "use": "@vercel/python" }
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "installCommand": "pip install --no-cache-dir -r requirements.txt"
+      }
+    },
+    { "src": "static/**/*", "use": "@vercel/static" }
   ],
-  "functions": {
-    "app/**/*.py": {
-      "memory": 512
-    }
-  },
-  "ignoreBuildStep": true,
   "routes": [
-    { "src": "/(.*)", "dest": "app/main.py" }
+    { "src": "/generate/(.*)", "dest": "/api/generator.py" }
   ]
 }
